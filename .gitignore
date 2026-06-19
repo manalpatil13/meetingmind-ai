@@ -20,3 +20,6 @@ Thumbs.db
 
 # Logs
 *.loggit add .
+
+uploads/*
+!uploads/.gitkeep

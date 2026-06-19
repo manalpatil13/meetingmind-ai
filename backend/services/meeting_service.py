@@ -28,3 +28,17 @@ def get_meeting_by_id(meeting_id):
         return response.data[0]
 
     return None
+
+def create_meeting(filename):
+
+    response = (
+        supabase
+        .table("meetings")
+        .insert({
+            "filename": filename,
+            "processing_status": "uploaded"
+        })
+        .execute()
+    )
+
+    return response.data[0]
