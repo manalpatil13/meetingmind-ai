@@ -3,13 +3,11 @@ venv/
 __pycache__/
 *.pyc
 
-# Environment variables
+# Environment
 .env
 
 # Node
 node_modules/
-
-# Vite
 dist/
 
 # IDE
@@ -17,8 +15,8 @@ dist/
 .idea/
 
 # OS
-.DS_Store
 Thumbs.db
+.DS_Store
 
 # Logs
-*.log
+*.loggit add .
