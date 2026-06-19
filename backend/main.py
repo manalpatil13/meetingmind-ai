@@ -5,6 +5,8 @@ from fastapi import (
     File
 )
 
+from fastapi.middleware.cors import CORSMiddleware
+
 from services.upload_service import save_uploaded_file
 
 from services.meeting_service import (
@@ -19,16 +21,25 @@ from services.meeting_service import (
 from ai.transcription import transcribe_audio
 from ai.analyzer import analyze_meeting
 
-
 app = FastAPI(
     title="MeetingMind AI",
     version="1.0.0"
 )
 
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.get("/")
 def root():
-
     return {
         "project": "MeetingMind AI",
         "status": "running"
@@ -37,7 +48,6 @@ def root():
 
 @app.get("/meetings")
 def meetings():
-
     return get_all_meetings()
 
 
@@ -93,7 +103,6 @@ def analysis(meeting_id: str):
 
 @app.get("/search")
 def search(q: str):
-
     return search_meetings(q)
 
 
