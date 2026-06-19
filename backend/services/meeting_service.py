@@ -1,6 +1,21 @@
 from database import supabase
 
 
+def create_meeting(filename):
+
+    response = (
+        supabase
+        .table("meetings")
+        .insert({
+            "filename": filename,
+            "processing_status": "uploaded"
+        })
+        .execute()
+    )
+
+    return response.data[0]
+
+
 def get_all_meetings():
 
     response = (
@@ -29,19 +44,22 @@ def get_meeting_by_id(meeting_id):
 
     return None
 
-def create_meeting(filename):
+
+def search_meetings(keyword):
 
     response = (
         supabase
         .table("meetings")
-        .insert({
-            "filename": filename,
-            "processing_status": "uploaded"
-        })
+        .select("*")
+        .or_(
+            f"meeting_title.ilike.%{keyword}%,summary.ilike.%{keyword}%,transcript.ilike.%{keyword}%"
+        )
+        .order("created_at", desc=True)
         .execute()
     )
 
-    return response.data[0]
+    return response.data
+
 
 def update_transcript(
     meeting_id,
@@ -60,6 +78,7 @@ def update_transcript(
     )
 
     return response.data[0]
+
 
 def update_analysis(
     meeting_id,

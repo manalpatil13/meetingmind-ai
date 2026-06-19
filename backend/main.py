@@ -1,42 +1,34 @@
-from fastapi import FastAPI, HTTPException
-from fastapi import UploadFile, File
+from fastapi import (
+    FastAPI,
+    HTTPException,
+    UploadFile,
+    File
+)
+
 from services.upload_service import save_uploaded_file
-from ai.transcription import transcribe_audio
-from ai.analyzer import analyze_meeting
 
 from services.meeting_service import (
+    create_meeting,
     get_all_meetings,
     get_meeting_by_id,
-    create_meeting,
+    search_meetings,
     update_transcript,
     update_analysis
 )
 
-from services.meeting_service import (
-    get_all_meetings,
-    get_meeting_by_id,
-    create_meeting,
-    update_transcript
-)
+from ai.transcription import transcribe_audio
+from ai.analyzer import analyze_meeting
 
-from services.meeting_service import (
-    get_all_meetings,
-    get_meeting_by_id,
-    create_meeting
-)
-
-from services.meeting_service import (
-    get_all_meetings,
-    get_meeting_by_id
-)
 
 app = FastAPI(
-    title="MeetingMind AI"
+    title="MeetingMind AI",
+    version="1.0.0"
 )
 
 
 @app.get("/")
 def root():
+
     return {
         "project": "MeetingMind AI",
         "status": "running"
@@ -62,12 +54,11 @@ def meeting(meeting_id: str):
 
     return result
 
+
 @app.get("/transcript/{meeting_id}")
 def transcript(meeting_id: str):
 
-    meeting = get_meeting_by_id(
-        meeting_id
-    )
+    meeting = get_meeting_by_id(meeting_id)
 
     if not meeting:
         raise HTTPException(
@@ -78,6 +69,33 @@ def transcript(meeting_id: str):
     return {
         "transcript": meeting["transcript"]
     }
+
+
+@app.get("/analysis/{meeting_id}")
+def analysis(meeting_id: str):
+
+    meeting = get_meeting_by_id(meeting_id)
+
+    if not meeting:
+        raise HTTPException(
+            status_code=404,
+            detail="Meeting not found"
+        )
+
+    return {
+        "summary": meeting["summary"],
+        "action_items": meeting["action_items"],
+        "decisions": meeting["decisions"],
+        "follow_ups": meeting["follow_ups"],
+        "risks": meeting["risks"]
+    }
+
+
+@app.get("/search")
+def search(q: str):
+
+    return search_meetings(q)
+
 
 @app.post("/upload")
 def upload_audio(
@@ -109,8 +127,11 @@ def upload_audio(
         "meeting": final_record
     }
 
-@app.get("/analysis/{meeting_id}")
-def analysis(meeting_id: str):
+
+@app.post("/analyze")
+def analyze_existing(
+    meeting_id: str
+):
 
     meeting = get_meeting_by_id(
         meeting_id
@@ -122,10 +143,13 @@ def analysis(meeting_id: str):
             detail="Meeting not found"
         )
 
-    return {
-        "summary": meeting["summary"],
-        "action_items": meeting["action_items"],
-        "decisions": meeting["decisions"],
-        "follow_ups": meeting["follow_ups"],
-        "risks": meeting["risks"]
-    }
+    analysis = analyze_meeting(
+        meeting["transcript"]
+    )
+
+    result = update_analysis(
+        meeting_id,
+        analysis
+    )
+
+    return result
