@@ -42,3 +42,21 @@ def create_meeting(filename):
     )
 
     return response.data[0]
+
+def update_transcript(
+    meeting_id,
+    transcript
+):
+
+    response = (
+        supabase
+        .table("meetings")
+        .update({
+            "transcript": transcript,
+            "processing_status": "transcribed"
+        })
+        .eq("id", meeting_id)
+        .execute()
+    )
+
+    return response.data[0]
