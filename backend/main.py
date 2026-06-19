@@ -2,6 +2,15 @@ from fastapi import FastAPI, HTTPException
 from fastapi import UploadFile, File
 from services.upload_service import save_uploaded_file
 from ai.transcription import transcribe_audio
+from ai.analyzer import analyze_meeting
+
+from services.meeting_service import (
+    get_all_meetings,
+    get_meeting_by_id,
+    create_meeting,
+    update_transcript,
+    update_analysis
+)
 
 from services.meeting_service import (
     get_all_meetings,
@@ -81,13 +90,42 @@ def upload_audio(
 
     transcript = transcribe_audio(filepath)
 
-    updated_meeting = update_transcript(
+    update_transcript(
         meeting["id"],
         transcript
     )
 
+    analysis = analyze_meeting(
+        transcript
+    )
+
+    final_record = update_analysis(
+        meeting["id"],
+        analysis
+    )
+
     return {
         "success": True,
-        "meeting": updated_meeting
+        "meeting": final_record
     }
 
+@app.get("/analysis/{meeting_id}")
+def analysis(meeting_id: str):
+
+    meeting = get_meeting_by_id(
+        meeting_id
+    )
+
+    if not meeting:
+        raise HTTPException(
+            status_code=404,
+            detail="Meeting not found"
+        )
+
+    return {
+        "summary": meeting["summary"],
+        "action_items": meeting["action_items"],
+        "decisions": meeting["decisions"],
+        "follow_ups": meeting["follow_ups"],
+        "risks": meeting["risks"]
+    }

@@ -60,3 +60,25 @@ def update_transcript(
     )
 
     return response.data[0]
+
+def update_analysis(
+    meeting_id,
+    analysis
+):
+
+    response = (
+        supabase
+        .table("meetings")
+        .update({
+            "summary": analysis["summary"],
+            "action_items": analysis["action_items"],
+            "decisions": analysis["decisions"],
+            "follow_ups": analysis["follow_ups"],
+            "risks": analysis["risks"],
+            "processing_status": "completed"
+        })
+        .eq("id", meeting_id)
+        .execute()
+    )
+
+    return response.data[0]
