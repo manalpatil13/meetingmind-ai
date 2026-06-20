@@ -1,51 +1,25 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import api from "../services/api";
+import AppLayout from "../layouts/AppLayout";
 
 function Dashboard() {
+    return (
+        <AppLayout>
 
-  const [meetings, setMeetings] = useState([]);
+            <div className="page-header">
 
-  useEffect(() => {
-    loadMeetings();
-  }, []);
+                <div>
+                    <h1 className="page-title">
+                        Meetings
+                    </h1>
 
-  const loadMeetings = async () => {
-    const response = await api.get("/meetings");
-    setMeetings(response.data);
-  };
+                    <p className="page-subtitle">
+                        Audio transformed into structured intelligence.
+                    </p>
+                </div>
 
-  return (
-    <div className="container">
+            </div>
 
-      <h1>MeetingMind AI</h1>
-
-      <div className="meeting-list">
-
-        {meetings.map((meeting) => (
-
-          <Link
-            key={meeting.id}
-            to={`/meeting/${meeting.id}`}
-            className="meeting-card"
-          >
-
-            <h3>
-              {meeting.meeting_title || "Untitled Meeting"}
-            </h3>
-
-            <p>
-              Status: {meeting.processing_status}
-            </p>
-
-          </Link>
-
-        ))}
-
-      </div>
-
-    </div>
-  );
+        </AppLayout>
+    );
 }
 
 export default Dashboard;

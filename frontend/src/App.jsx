@@ -1,33 +1,32 @@
 import {
-  BrowserRouter,
-  Routes,
-  Route
+    BrowserRouter,
+    Routes,
+    Route
 } from "react-router-dom";
 
 import Dashboard from "./pages/Dashboard";
 import MeetingDetails from "./pages/MeetingDetails";
 
 function App() {
+    return (
+        <BrowserRouter>
 
-  return (
-    <BrowserRouter>
+            <Routes>
 
-      <Routes>
+                <Route
+                    path="/"
+                    element={<Dashboard />}
+                />
 
-        <Route
-          path="/"
-          element={<Dashboard />}
-        />
+                <Route
+                    path="/meeting/:id"
+                    element={<MeetingDetails />}
+                />
 
-        <Route
-          path="/meeting/:id"
-          element={<MeetingDetails />}
-        />
+            </Routes>
 
-      </Routes>
-
-    </BrowserRouter>
-  );
+        </BrowserRouter>
+    );
 }
 
 export default App;
