@@ -1,31 +1,44 @@
+import os
 import json
 import re
 import requests
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+OLLAMA_URL = os.getenv(
+    "OLLAMA_URL",
+    "http://localhost:11434"
+)
+
+MODEL_NAME = os.getenv(
+    "MODEL_NAME",
+    "llama3"
+)
 
 
 def analyze_meeting(transcript):
 
     prompt = f"""
-You are an AI meeting assistant.
+You are an expert meeting assistant.
 
-Analyze the meeting transcript.
+Analyze this meeting transcript.
 
 IMPORTANT:
-- Return ONLY valid JSON.
-- Do not explain anything.
-- Do not write text before JSON.
-- Do not write text after JSON.
+- Return ONLY JSON.
+- Never leave meeting_title empty.
 - Never leave summary empty.
-- Generate a professional meeting title.
-- Title must be 3-8 words.
+- Create a title between 3 and 8 words.
+- Create a summary between 1 and 3 sentences.
 
-Examples:
+Example titles:
 - Sprint Planning Meeting
-- Frontend Deployment Review
-- Authentication Readiness Discussion
-- Version 1 Launch Planning
+- Version 1 Launch Review
+- Frontend Deployment Discussion
+- Authentication Readiness Meeting
 
-Return EXACTLY this schema:
+Return EXACTLY:
 
 {{
     "meeting_title": "",
@@ -60,9 +73,9 @@ Transcript:
 """
 
     response = requests.post(
-        "http://localhost:11434/api/generate",
+        f"{OLLAMA_URL}/api/generate",
         json={
-            "model": "llama3",
+            "model": MODEL_NAME,
             "prompt": prompt,
             "stream": False
         }
@@ -72,12 +85,12 @@ Transcript:
 
     raw_text = result["response"]
 
-    print("\n========== LLAMA RESPONSE ==========\n")
+    print("\n===== RAW AI OUTPUT =====\n")
     print(raw_text)
-    print("\n====================================\n")
+    print("\n=========================\n")
 
     try:
-        return json.loads(raw_text)
+        data = json.loads(raw_text)
 
     except:
 
@@ -87,12 +100,23 @@ Transcript:
             re.DOTALL
         )
 
-        if match:
-
-            return json.loads(
-                match.group()
+        if not match:
+            raise Exception(
+                "No JSON found."
             )
 
-        raise Exception(
-            "Failed to extract JSON from Llama output."
+        data = json.loads(
+            match.group()
         )
+
+    if not data.get("meeting_title"):
+        data["meeting_title"] = (
+            "Meeting Discussion"
+        )
+
+    if not data.get("summary"):
+        data["summary"] = (
+            "The meeting discussed progress, action items, decisions, and next steps."
+        )
+
+    return data
