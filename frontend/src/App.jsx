@@ -6,9 +6,12 @@ import {
 
 import Dashboard from "./pages/Dashboard";
 import MeetingDetails from "./pages/MeetingDetails";
+import Analytics from "./pages/Analytics";
 
 function App() {
+
     return (
+
         <BrowserRouter>
 
             <Routes>
@@ -23,9 +26,15 @@ function App() {
                     element={<MeetingDetails />}
                 />
 
+                <Route
+                    path="/analytics"
+                    element={<Analytics />}
+                />
+
             </Routes>
 
         </BrowserRouter>
+
     );
 }
 

@@ -5,8 +5,12 @@ import {
     FiUser
 } from "react-icons/fi";
 
+import { Link } from "react-router-dom";
+
 function Sidebar() {
+
     return (
+
         <aside className="sidebar">
 
             <div>
@@ -17,15 +21,21 @@ function Sidebar() {
 
                 <nav>
 
-                    <a className="nav-item">
+                    <Link
+                        to="/"
+                        className="nav-item"
+                    >
                         <FiHome />
                         Meetings
-                    </a>
+                    </Link>
 
-                    <a className="nav-item">
+                    <Link
+                        to="/analytics"
+                        className="nav-item"
+                    >
                         <FiBarChart2 />
                         Analytics
-                    </a>
+                    </Link>
 
                     <a className="nav-item">
                         <FiSettings />
@@ -41,13 +51,19 @@ function Sidebar() {
                 <FiUser />
 
                 <div>
-                    <strong>Manal Patil</strong>
-                    <p>AI Engineer</p>
+                    <strong>
+                        Manal Patil
+                    </strong>
+
+                    <p>
+                        AI Engineer
+                    </p>
                 </div>
 
             </div>
 
         </aside>
+
     );
 }
 

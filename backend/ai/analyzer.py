@@ -1,4 +1,3 @@
-import os
 import json
 import re
 import requests
@@ -7,18 +6,52 @@ import requests
 def analyze_meeting(transcript):
 
     prompt = f"""
-Analyze the following meeting transcript.
+You are an AI meeting assistant.
 
-Return ONLY valid JSON.
+Analyze the meeting transcript.
 
-Format:
+IMPORTANT:
+- Return ONLY valid JSON.
+- Do not explain anything.
+- Do not write text before JSON.
+- Do not write text after JSON.
+- Never leave summary empty.
+- Generate a professional meeting title.
+- Title must be 3-8 words.
+
+Examples:
+- Sprint Planning Meeting
+- Frontend Deployment Review
+- Authentication Readiness Discussion
+- Version 1 Launch Planning
+
+Return EXACTLY this schema:
 
 {{
+    "meeting_title": "",
     "summary": "",
-    "action_items": [],
-    "decisions": [],
-    "follow_ups": [],
-    "risks": []
+    "action_items": [
+        {{
+            "name": "",
+            "task": ""
+        }}
+    ],
+    "decisions": [
+        {{
+            "decision": ""
+        }}
+    ],
+    "follow_ups": [
+        {{
+            "date": "",
+            "action": ""
+        }}
+    ],
+    "risks": [
+        {{
+            "risk": ""
+        }}
+    ]
 }}
 
 Transcript:
@@ -31,41 +64,35 @@ Transcript:
         json={
             "model": "llama3",
             "prompt": prompt,
-            "stream": False,
-            "format": "json"
+            "stream": False
         }
     )
 
-    if response.status_code != 200:
-        raise Exception(
-            f"Ollama request failed: {response.text}"
-        )
-
     result = response.json()
 
-    response_text = result.get("response", "")
+    raw_text = result["response"]
 
-    print("\n========== OLLAMA RESPONSE ==========")
-    print(response_text)
-    print("=====================================\n")
+    print("\n========== LLAMA RESPONSE ==========\n")
+    print(raw_text)
+    print("\n====================================\n")
 
     try:
-        return json.loads(response_text)
+        return json.loads(raw_text)
 
-    except json.JSONDecodeError:
+    except:
 
         match = re.search(
             r"\{.*\}",
-            response_text,
+            raw_text,
             re.DOTALL
         )
 
         if match:
-            try:
-                return json.loads(match.group())
-            except json.JSONDecodeError:
-                pass
+
+            return json.loads(
+                match.group()
+            )
 
         raise Exception(
-            f"Could not parse JSON from Ollama response:\n\n{response_text}"
+            "Failed to extract JSON from Llama output."
         )

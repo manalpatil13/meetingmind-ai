@@ -54,7 +54,6 @@ def search_meetings(keyword):
         .or_(
             f"meeting_title.ilike.%{keyword}%,summary.ilike.%{keyword}%,transcript.ilike.%{keyword}%"
         )
-        .order("created_at", desc=True)
         .execute()
     )
 
@@ -89,12 +88,26 @@ def update_analysis(
         supabase
         .table("meetings")
         .update({
-            "summary": analysis["summary"],
-            "action_items": analysis["action_items"],
-            "decisions": analysis["decisions"],
-            "follow_ups": analysis["follow_ups"],
-            "risks": analysis["risks"],
-            "processing_status": "completed"
+            "meeting_title":
+                analysis["meeting_title"],
+
+            "summary":
+                analysis["summary"],
+
+            "action_items":
+                analysis["action_items"],
+
+            "decisions":
+                analysis["decisions"],
+
+            "follow_ups":
+                analysis["follow_ups"],
+
+            "risks":
+                analysis["risks"],
+
+            "processing_status":
+                "completed"
         })
         .eq("id", meeting_id)
         .execute()

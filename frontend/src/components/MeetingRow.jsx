@@ -15,6 +15,7 @@ function MeetingRow({ meeting }) {
         meeting.risks?.length || 0;
 
     return (
+
         <Link
             to={`/meeting/${meeting.id}`}
             className="meeting-row"
@@ -23,50 +24,43 @@ function MeetingRow({ meeting }) {
             <div className="meeting-main">
 
                 <h3>
-                    {meeting.meeting_title ||
-                        "Untitled Meeting"}
+                    {
+                        meeting.meeting_title ||
+                        "Untitled Meeting"
+                    }
                 </h3>
 
                 <p>
-                    {meeting.summary ||
-                        "No summary available"}
+                    {
+                        meeting.summary ||
+                        "No summary available"
+                    }
                 </p>
 
             </div>
 
             <div className="meeting-signals">
 
-                <span
-                    className="signal action"
-                    title="Actions"
-                >
+                <span className="signal action">
                     {actions}
                 </span>
 
-                <span
-                    className="signal decision"
-                    title="Decisions"
-                >
+                <span className="signal decision">
                     {decisions}
                 </span>
 
-                <span
-                    className="signal follow"
-                    title="Follow Ups"
-                >
+                <span className="signal follow">
                     {followups}
                 </span>
 
-                <span
-                    className="signal risk"
-                    title="Risks"
-                >
+                <span className="signal risk">
                     {risks}
                 </span>
 
             </div>
 
         </Link>
+
     );
 }
 

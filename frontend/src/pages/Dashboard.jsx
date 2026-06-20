@@ -5,31 +5,35 @@ import api from "../services/api";
 
 import StatsBar from "../components/StatsBar";
 import MeetingRow from "../components/MeetingRow";
+import UploadModal from "../components/UploadModal";
 
 function Dashboard() {
 
-    const [meetings, setMeetings] = useState([]);
+    const [meetings, setMeetings] =
+        useState([]);
 
-    const [search, setSearch] = useState("");
+    const [search, setSearch] =
+        useState("");
+
+    const [showUpload, setShowUpload] =
+        useState(false);
 
     useEffect(() => {
         loadMeetings();
     }, []);
 
     async function loadMeetings() {
-        try {
-            const response =
-                await api.get("/meetings");
 
-            setMeetings(response.data);
+        const response =
+            await api.get("/meetings");
 
-        } catch (error) {
-            console.error(error);
-        }
+        setMeetings(
+            response.data
+        );
     }
 
-    const filtered = meetings.filter(
-        meeting => {
+    const filtered =
+        meetings.filter(meeting => {
 
             const title =
                 meeting.meeting_title || "";
@@ -38,20 +42,17 @@ function Dashboard() {
                 meeting.summary || "";
 
             return (
-                title
-                    .toLowerCase()
+                title.toLowerCase()
                     .includes(
                         search.toLowerCase()
                     ) ||
 
-                summary
-                    .toLowerCase()
+                summary.toLowerCase()
                     .includes(
                         search.toLowerCase()
                     )
             );
-        }
-    );
+        });
 
     const totalActions =
         meetings.reduce(
@@ -86,7 +87,12 @@ function Dashboard() {
 
                 </div>
 
-                <button className="upload-button">
+                <button
+                    className="upload-button"
+                    onClick={() =>
+                        setShowUpload(true)
+                    }
+                >
                     Upload Recording
                 </button>
 
@@ -111,33 +117,24 @@ function Dashboard() {
 
             <div className="meeting-list">
 
-                {filtered.length === 0 ? (
+                {filtered.map(meeting => (
 
-                    <div className="empty-state">
+                    <MeetingRow
+                        key={meeting.id}
+                        meeting={meeting}
+                    />
 
-                        <h2>
-                            No meetings found
-                        </h2>
-
-                        <p>
-                            Upload a recording to
-                            see it structured here.
-                        </p>
-
-                    </div>
-
-                ) : (
-
-                    filtered.map(meeting => (
-                        <MeetingRow
-                            key={meeting.id}
-                            meeting={meeting}
-                        />
-                    ))
-
-                )}
+                ))}
 
             </div>
+
+            <UploadModal
+                open={showUpload}
+                onClose={() =>
+                    setShowUpload(false)
+                }
+                onSuccess={loadMeetings}
+            />
 
         </AppLayout>
     );
