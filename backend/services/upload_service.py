@@ -1,22 +1,37 @@
 import os
-from uuid import uuid4
+import uuid
 
 
-UPLOAD_DIR = "uploads"
+UPLOAD_FOLDER = "uploads"
+
+os.makedirs(
+    UPLOAD_FOLDER,
+    exist_ok=True
+)
 
 
 def save_uploaded_file(file):
 
-    extension = file.filename.split(".")[-1]
-
-    unique_name = f"{uuid4()}.{extension}"
-
-    filepath = os.path.join(
-        UPLOAD_DIR,
-        unique_name
+    extension = (
+        file.filename.split(".")[-1]
     )
 
-    with open(filepath, "wb") as buffer:
-        buffer.write(file.file.read())
+    filename = (
+        f"{uuid.uuid4()}.{extension}"
+    )
 
-    return filepath, unique_name
+    filepath = os.path.join(
+        UPLOAD_FOLDER,
+        filename
+    )
+
+    with open(
+        filepath,
+        "wb"
+    ) as buffer:
+
+        buffer.write(
+            file.file.read()
+        )
+
+    return filepath, filename

@@ -1,25 +1,31 @@
 # Python
+
 venv/
 __pycache__/
 *.pyc
 
 # Environment
+
 .env
 
-# Node
-node_modules/
-dist/
-
-# IDE
-.vscode/
-.idea/
-
-# OS
-Thumbs.db
-.DS_Store
-
-# Logs
-*.loggit add .
+# Uploads
 
 uploads/*
 !uploads/.gitkeep
+
+# Node
+
+node_modules/
+
+# Vite
+
+dist/
+
+# VS Code
+
+.vscode/
+
+# OS
+
+.DS_Store
+Thumbs.db

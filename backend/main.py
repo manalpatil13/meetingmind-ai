@@ -1,3 +1,4 @@
+import os
 from fastapi import (
     FastAPI,
     HTTPException,
@@ -111,30 +112,43 @@ def upload_audio(
     audio: UploadFile = File(...)
 ):
 
-    filepath, filename = save_uploaded_file(audio)
-
-    meeting = create_meeting(filename)
-
-    transcript = transcribe_audio(filepath)
-
-    update_transcript(
-        meeting["id"],
-        transcript
+    filepath, filename = save_uploaded_file(
+        audio
     )
 
-    analysis = analyze_meeting(
-        transcript
-    )
+    try:
 
-    final_record = update_analysis(
-        meeting["id"],
-        analysis
-    )
+        meeting = create_meeting(
+            filename
+        )
 
-    return {
-        "success": True,
-        "meeting": final_record
-    }
+        transcript = transcribe_audio(
+            filepath
+        )
+
+        update_transcript(
+            meeting["id"],
+            transcript
+        )
+
+        analysis = analyze_meeting(
+            transcript
+        )
+
+        final_record = update_analysis(
+            meeting["id"],
+            analysis
+        )
+
+        return {
+            "success": True,
+            "meeting": final_record
+        }
+
+    finally:
+
+        if os.path.exists(filepath):
+            os.remove(filepath)
 
 
 @app.post("/analyze")
