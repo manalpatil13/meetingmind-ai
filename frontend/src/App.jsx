@@ -7,6 +7,7 @@ import {
 import Dashboard from "./pages/Dashboard";
 import MeetingDetails from "./pages/MeetingDetails";
 import Analytics from "./pages/Analytics";
+import Settings from "./pages/Settings";
 
 function App() {
 
@@ -29,6 +30,11 @@ function App() {
                 <Route
                     path="/analytics"
                     element={<Analytics />}
+                />
+
+                <Route
+                    path="/settings"
+                    element={<Settings />}
                 />
 
             </Routes>

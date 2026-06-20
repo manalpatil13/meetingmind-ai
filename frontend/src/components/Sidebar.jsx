@@ -16,7 +16,7 @@ function Sidebar() {
             <div>
 
                 <div className="logo">
-                    MeetingMind
+                    MeetingMind AI
                 </div>
 
                 <nav>
@@ -37,10 +37,13 @@ function Sidebar() {
                         Analytics
                     </Link>
 
-                    <a className="nav-item">
+                    <Link
+                        to="/settings"
+                        className="nav-item"
+                    >
                         <FiSettings />
                         Settings
-                    </a>
+                    </Link>
 
                 </nav>
 
@@ -51,6 +54,7 @@ function Sidebar() {
                 <FiUser />
 
                 <div>
+
                     <strong>
                         Manal Patil
                     </strong>
@@ -58,6 +62,7 @@ function Sidebar() {
                     <p>
                         AI Engineer
                     </p>
+
                 </div>
 
             </div>
