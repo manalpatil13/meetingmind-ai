@@ -229,7 +229,7 @@ GitHub:
 https://github.com/manalpatil13
 
 LinkedIn:
-(Add LinkedIn URL)
+www.linkedin.com/in/manal-patil-4835b82a2
 
 ---
 
