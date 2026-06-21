@@ -1,44 +1,30 @@
 import os
 import json
 import re
-import requests
 
+from groq import Groq
 from dotenv import load_dotenv
 
 load_dotenv()
 
-OLLAMA_URL = os.getenv(
-    "OLLAMA_URL",
-    "http://localhost:11434"
+client = Groq(
+    api_key=os.getenv(
+        "GROQ_API_KEY"
+    )
 )
 
 MODEL_NAME = os.getenv(
     "MODEL_NAME",
-    "llama3"
+    "llama-3.3-70b-versatile"
 )
 
 
 def analyze_meeting(transcript):
 
     prompt = f"""
-You are an expert meeting assistant.
-
 Analyze this meeting transcript.
 
-IMPORTANT:
-- Return ONLY JSON.
-- Never leave meeting_title empty.
-- Never leave summary empty.
-- Create a title between 3 and 8 words.
-- Create a summary between 1 and 3 sentences.
-
-Example titles:
-- Sprint Planning Meeting
-- Version 1 Launch Review
-- Frontend Deployment Discussion
-- Authentication Readiness Meeting
-
-Return EXACTLY:
+Return ONLY valid JSON.
 
 {{
     "meeting_title": "",
@@ -67,27 +53,28 @@ Return EXACTLY:
     ]
 }}
 
-Transcript:
+Meeting transcript:
 
 {transcript}
 """
 
-    response = requests.post(
-        f"{OLLAMA_URL}/api/generate",
-        json={
-            "model": MODEL_NAME,
-            "prompt": prompt,
-            "stream": False
-        }
+    response = client.chat.completions.create(
+        model=MODEL_NAME,
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0.2
     )
 
-    result = response.json()
-
-    raw_text = result["response"]
-
-    print("\n===== RAW AI OUTPUT =====\n")
-    print(raw_text)
-    print("\n=========================\n")
+    raw_text = (
+        response
+        .choices[0]
+        .message
+        .content
+    )
 
     try:
         data = json.loads(raw_text)
@@ -102,21 +89,25 @@ Transcript:
 
         if not match:
             raise Exception(
-                "No JSON found."
+                "Invalid AI response."
             )
 
         data = json.loads(
             match.group()
         )
 
-    if not data.get("meeting_title"):
+    if not data.get(
+        "meeting_title"
+    ):
         data["meeting_title"] = (
             "Meeting Discussion"
         )
 
-    if not data.get("summary"):
+    if not data.get(
+        "summary"
+    ):
         data["summary"] = (
-            "The meeting discussed progress, action items, decisions, and next steps."
+            "Meeting discussion and decisions."
         )
 
     return data
