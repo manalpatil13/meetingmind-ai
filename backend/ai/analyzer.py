@@ -8,23 +8,25 @@ from dotenv import load_dotenv
 load_dotenv()
 
 client = Groq(
-    api_key=os.getenv(
-        "GROQ_API_KEY"
-    )
+    api_key=os.getenv("GROQ_API_KEY")
 )
 
 MODEL_NAME = os.getenv(
     "MODEL_NAME",
-    "llama-3.3-70b-versatile"
+    "llama-3.1-8b-instant"
 )
 
 
 def analyze_meeting(transcript):
 
     prompt = f"""
-Analyze this meeting transcript.
+You are an expert meeting assistant.
+
+Analyze the following meeting transcript.
 
 Return ONLY valid JSON.
+
+Return EXACTLY this structure:
 
 {{
     "meeting_title": "",
@@ -53,7 +55,13 @@ Return ONLY valid JSON.
     ]
 }}
 
-Meeting transcript:
+Rules:
+- Never leave title empty.
+- Never leave summary empty.
+- Use concise titles.
+- Use arrays.
+
+Transcript:
 
 {transcript}
 """
@@ -62,52 +70,25 @@ Meeting transcript:
         model=MODEL_NAME,
         messages=[
             {
+                "role": "system",
+                "content": "You only return JSON."
+            },
+            {
                 "role": "user",
                 "content": prompt
             }
         ],
-        temperature=0.2
+        temperature=0,
+        response_format={
+            "type": "json_object"
+        }
     )
 
-    raw_text = (
+    content = (
         response
         .choices[0]
         .message
         .content
     )
 
-    try:
-        data = json.loads(raw_text)
-
-    except:
-
-        match = re.search(
-            r"\{.*\}",
-            raw_text,
-            re.DOTALL
-        )
-
-        if not match:
-            raise Exception(
-                "Invalid AI response."
-            )
-
-        data = json.loads(
-            match.group()
-        )
-
-    if not data.get(
-        "meeting_title"
-    ):
-        data["meeting_title"] = (
-            "Meeting Discussion"
-        )
-
-    if not data.get(
-        "summary"
-    ):
-        data["summary"] = (
-            "Meeting discussion and decisions."
-        )
-
-    return data
+    return json.loads(content)

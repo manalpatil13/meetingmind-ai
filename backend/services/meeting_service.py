@@ -89,22 +89,40 @@ def update_analysis(
         .table("meetings")
         .update({
             "meeting_title":
-                analysis["meeting_title"],
+                analysis.get(
+                    "meeting_title",
+                    "Meeting Discussion"
+                ),
 
             "summary":
-                analysis["summary"],
+                analysis.get(
+                    "summary",
+                    "Meeting discussion."
+                ),
 
             "action_items":
-                analysis["action_items"],
+                analysis.get(
+                    "action_items",
+                    []
+                ),
 
             "decisions":
-                analysis["decisions"],
+                analysis.get(
+                    "decisions",
+                    []
+                ),
 
             "follow_ups":
-                analysis["follow_ups"],
+                analysis.get(
+                    "follow_ups",
+                    []
+                ),
 
             "risks":
-                analysis["risks"],
+                analysis.get(
+                    "risks",
+                    []
+                ),
 
             "processing_status":
                 "completed"
@@ -114,3 +132,4 @@ def update_analysis(
     )
 
     return response.data[0]
+
